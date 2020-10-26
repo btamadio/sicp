@@ -115,3 +115,14 @@
   (sqrt-iter 0.0 1.0 x))
 
 ; Exercise 1.8
+
+(defn improve-cube [guess x]
+  (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
+
+(defn cube-root-iter [prev-guess guess x]
+  (if (good-enough? prev-guess guess)
+    guess
+    (cube-root-iter guess (improve-cube guess x) x)))
+
+(defn cube-root [x]
+  (cube-root-iter 0.0 1.0 x))
