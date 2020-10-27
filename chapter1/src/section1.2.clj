@@ -83,6 +83,5 @@
   (cond
     (= j 0) 1
     (= i j) 1
-    (and (> j 0) (<= j i)) (+ (pascal (- i 1) (- j 1)) (pascal (- i 1) j))
-    :else nil))
+    (and (> j 0) (<= j i)) (+ (pascal (- i 1) (- j 1)) (pascal (- i 1) j))))
 
