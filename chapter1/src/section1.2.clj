@@ -2,13 +2,13 @@
 
 ; Exercise 1.9
 
-; This is a recursive process, defined as a recursive procedure
+; This is a recursive process
 (defn plus [a b]
   (if (= a 0)
     b
     (inc (plus (dec a) b))))
 
-; This is an iterative process, defined as a recursive procedure
+; This is an iterative process
 ; NB: Clojure requires use of 'recur' function to ensure tail-call optimization
 (defn plus [a b]
   (if (= a 0)
@@ -55,3 +55,34 @@
 
 
 ; Exercise 1.11
+
+(defn f-recur [n]
+  (if
+      (< n 3) n
+      (+ (f-recur (- n 1)) (* 2 (f-recur (- n 2))) (* 3 (f-recur (- n 3))))))
+
+(defn f-iter-iter [sum sum2 sum3 count]
+  (if
+      (= count 2) sum
+      (recur (+ sum (* 2 sum2) (* 3 sum3)) sum sum2 (dec count))))
+
+(defn f-iter [n]
+  (if
+      (< n 3) n
+      (f-iter-iter 2 1 0 n)))
+
+; Exercise 1.12: Pascal's triangle
+; P(i, j) denotes the jth element of row i
+
+
+; P(i, 0) = 1
+; P(k, k) = 1
+; P(i, j) = P(i-1, j-1) + P(i-1, j)
+
+(defn pascal [i j]
+  (cond
+    (= j 0) 1
+    (= i j) 1
+    (and (> j 0) (<= j i)) (+ (pascal (- i 1) (- j 1)) (pascal (- i 1) j))
+    :else nil))
+
