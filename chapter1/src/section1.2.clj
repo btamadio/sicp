@@ -85,3 +85,44 @@
     (= i j) 1
     (and (> j 0) (<= j i)) (+ (pascal (- i 1) (- j 1)) (pascal (- i 1) j))))
 
+; Exercise 1.13
+
+; Exercise 1.14
+
+(def first-denom {1 1 2 5 3 10 4 25 5 50})
+
+(defn cc [amount kinds-of-coins]
+  (cond
+    (= amount 0) 1
+    (or (< amount 0) (= kinds-of-coins 0)) 0
+    :else (+ (cc amount (- kinds-of-coins 1))
+             (cc (- amount (first-denom kinds-of-coins)) kinds-of-coins))))
+
+(defn count-change [amount]
+  (cc amount 5))
+
+(count-change 100) ; => 292
+
+(count-change 11) ; => 4
+
+;                                           (11 5)
+;                                            /
+;                                        (11 4)
+;                                         /
+;                                  __ (11 3)____
+;                                /               \ ______________
+;                               /                                \
+;              _______ _(11 2)_____                              (1 3)
+;             /                    \                             /
+;            /                      \                           |
+;       (11 1)                   ___(6 2)_____                 (1 2)
+;     /      \                  /             \                 |
+; (11 0)    (10 1)          (6 1)               (1 2)        (1 1)
+;   |      /     \          /   \               /              |
+;   0  (10 0)    (9 1)  (6 0)   (5 1)       (1 1)              1
+;   |    |      /    \    |    /    \        /  \
+;   0    0   (9 0) (8 1)  0  (5 0) (4 1)  (1 0) (0 1)
+;   |    |     |     |    |    |     |      |     |
+;   0    0     0   (7 1)  0    0   (3 1)    1     0
+;                   ...             ...
+;                    1               1
