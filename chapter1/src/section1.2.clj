@@ -128,3 +128,106 @@
 ;              0   (7 1)       0   (3 1)    0     1
 ;                   ...             ...
 ;                    1               1
+
+; Exercise 1.15
+(defn cube [x]
+  (* x x x))
+
+(defn p [x]
+  (- (* 3 x) (* 4 (cube x))))
+
+(defn sine [angle]
+  (if (<= (Math/abs angle) 0.1)
+    angle
+    (p (sine (/ angle 3.0)))))
+
+; How many times is function p applied when (sine 12.15) is evaluated?
+; (sine 12.15)
+;  = (p (sine 4.05))
+;  = (p (p (sine 1.35)))
+;  = (p (p (p (sine 0.45))))
+;  = (p (p (p (p (sine 0.15)))))
+;  = (p (p (p (p (p (sine 0.05))))))
+;  = (p (p (p (p (p 0.05)))))
+;   p is applied 5 times
+
+(p (p (p (p (p 0.05)))))
+;=> -0.39980345741334
+
+(sine 12.15)
+;=> -0.39980345741334
+
+
+; Order of growth
+;   a             num steps (applying function p)
+;  <= 0.1            0
+; 0.1 < a <= 0.3     1
+; 0.3 < a <= 0.9     2
+; 0.9 < a <= 2.7     3
+; 2.7 < a <= 8.1     4
+; 8.1 < a <= 24.3    5
+
+; a ~ 0.1 * 3^n
+; n ~ log(a)
+
+(defn expt-iter [b counter product]
+  (if (= counter 0)
+    product
+    (expt-iter b
+               (- counter 1)
+               (* b product))))
+
+(defn expt [b n]
+  (expt-iter b n 1))
+
+(defn square [x] (* x x))
+
+(defn fast-expt [b n]
+  (cond
+    (= n 0) 1
+    (even? n) (square (fast-expt b (/ n 2)))
+    :else (* b (fast-expt b (- n 1)))))
+
+; Exercise 1.16
+; Iterative exponentiation that is O(log N)
+
+; Using a*b^n = a*(b^(n/2))^2 = a*(b^2)^(n/2)
+; and a*b^n = a*b*b^(n-1) = (a*b)*(b^(n-1))
+
+; Then 
+; n even: a -> a, b -> b^2, n -> n/2
+; n odd: a -> a*b, b-> b, n -> n-1
+
+(defn fast-expt-iter [a b n]
+  (cond
+    (= n 0) a
+    (even? n) (recur a (* b b) (/ n 2))
+    :else (recur (* a b) b (- n 1))))
+
+(defn fast-expt [b n]
+  (fast-expt-iter 1 b n))
+
+; Exercise 1.17
+
+(defn halve [x] (/ x 2))
+(defn dbl [x] (* x 2))
+
+; as a recursive process
+(defn fast-mult [a b]
+  (cond
+    (= b 0) 0
+    (even? b) (dbl (fast-mult a (halve b)))
+    :else (+ a (fast-mult a (- b 1)))))
+
+; as an iterative process
+
+(defn fast-mult-iter [a b c]
+  (cond
+    (= b 0) c
+    (even? b) (fast-mult-iter (dbl a) (halve b) c)
+    :else (fast-mult-iter a (- b 1) (+ a c))))
+
+(defn fast-mult [a b]
+  (fast-mult-iter a b 0))
+
+
