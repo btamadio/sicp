@@ -212,14 +212,13 @@
 (defn halve [x] (/ x 2))
 (defn dbl [x] (* x 2))
 
-; as a recursive process
 (defn fast-mult [a b]
   (cond
     (= b 0) 0
     (even? b) (dbl (fast-mult a (halve b)))
     :else (+ a (fast-mult a (- b 1)))))
 
-; as an iterative process
+; Exercise 1.18
 
 (defn fast-mult-iter [a b c]
   (cond
@@ -229,5 +228,4 @@
 
 (defn fast-mult [a b]
   (fast-mult-iter a b 0))
-
 
