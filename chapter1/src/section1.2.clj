@@ -254,3 +254,62 @@
 
 (defn fib [n]
   (fib-iter 1 0 0 1 n))
+
+; Exercise 1.20
+
+(defn gcd [a b]
+  (if (= b 0) a
+      (recur b (mod a b))))
+
+; normal order (fully expand before evaluating)
+; except for conditionals, where the predicate is immediately evaluated
+; and the result determines whether to evaluate the consequent or the alternative expression
+
+; (gcd 206 40)
+; a = 206, b = 40
+; evaluate b in predicate: 0 remainders
+
+; (gcd 40 (mod 206 40))
+; a = 40, b = (mod 206 40)
+; evaluate b in predicate: *1 remainder*
+
+; (gcd (mod 206 40) (mod 40 (mod 206 40)))
+; a = (mod 206 40), b = (mod 40 (mod 206 40))
+; evaluate b in predicate: *2 remainders
+
+; (gcd (mod 40 (mod 206 40)) (mod (mod 206 40) (mod 40 (mod 206 40)))) 
+; a = (mod 40 (mod 206 40)), b = (mod (mod 206 40) (mod 40 (mod 206 40)))
+; evaluate b in predicate: *4 remainders*
+
+; (gcd (mod (mod 206 40) (mod 40 (mod 206 40))) (mod (mod 40 (mod 206 40)) (mod (mod 206 40) (mod 40 (mod 206 40)))))
+; a = (mod (mod 206 40) (mod 40 (mod 206 40))), b = (mod (mod 40 (mod 206 40)) (mod (mod 206 40) (mod 40 (mod 206 40))))
+; evaluate bin predicate: *7 remainders*
+; predicate is true!
+; evaluate a: *4 remainders*
+
+; Normal order total: 18 remainders computed
+
+; applicative order:
+; (gcd 206 40)
+; a = 206, b = 40
+; evaluate b in predicate: 0 remainders
+
+; (gcd 40 (mod 206 40))
+; evaluate argument: *1 remainder*
+; (gcd 40 6)
+; evaluate predicate: 0 remainders
+; (gcd 6 (mod 40 6))
+; evaluate argument: *1 remainder*
+; (gcd 6 4)
+; evaluate predicate: 0 remainders
+; (gcd 6 (mod 6 4))
+; evaluate argument: *1 remainder*
+; (gcd 4 2)
+; evaluate predicate: 0 remainders
+; (gcd 2 (mod 4 2))
+; evaluate argument: *1 remainder*
+; (gcd 2 0)
+; evaluate predicate: 0 remainders
+; 2
+
+; Applicative order total: 4 remainders computed
