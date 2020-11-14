@@ -229,3 +229,28 @@
 (defn fast-mult [a b]
   (fast-mult-iter a b 0))
 
+
+; Exercise 1.19
+; Tpq(a, b) = a -> (p + q)a + qb
+;             b -> qa + pb
+; Applying this twice gives:
+; Tpq^2(a, b) = a -> ((p+q)((p+q)a + qb) + q (qa + pb)
+;               b -> q((p+q)a+qb) + p(qa+pb)
+
+; Then find p', q' such that: Tp'q' = Tpq^2
+
+; Eq 1: (p'+q')a + q'b = ((p+q)((p+q)a + qb) + q (qa + pb)
+; Eq 2: q'a + p'b = q((p+q)a+qb) + p(qa+pb)
+
+; Then do about a page or two of algebra to get:
+; p' = p^2 + q^2
+; q' = q^2 + 2pq
+
+(defn fib-iter [a b p q count]
+  (cond
+    (= count 0) b
+    (even? count) (recur a b (+ (* p p) (* q q)) (+ (* q q) (* 2 p q)) (/ count 2))
+    :else (recur (+ (* b q) (* a q) (* a p)) (+ (* b p) (* a q)) p q (- count 1))))
+
+(defn fib [n]
+  (fib-iter 1 0 0 1 n))
