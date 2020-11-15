@@ -499,3 +499,12 @@
   (time (fermat-prime? x 1000)))
 
 ; These 100-digit primes take about 1 second to check (using 1000 random ints each time)
+
+; Ex 1.25
+
+(defn bad-exp-mod [base exp m]
+  (mod (fast-expt base exp) m))
+
+; This won't work for testing for primes because the result of (fast-expt base exp) will be too big
+; and we'll get an Integer Overflow. In expmod, we take the remainder at each iteration, so we never
+; have such huge numbers.
