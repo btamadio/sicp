@@ -530,3 +530,40 @@
 (first-n-carm 10)
 ; (561 1105 1729 2465 2821 6601 8911 10585 15841 29341)
 
+; Exercise 1.28
+
+#_(defn is-sqrt1-mod [x m]
+  (and (= (mod (square x) m) 1) (not= x (dec m)) (not= x 1)))
+
+(defn expmod-mr [base exp m]
+  (cond
+    (= exp 0) 1
+    (even? exp) (let [x (expmod-mr base (/ exp 2) m)
+                      x2 (mod (square x) m)]
+                  (if (and (= x2 1) (not= x 1) (not= x (dec m)))
+                    0
+                    x2))
+    :else (mod (* base (expmod-mr base (- exp 1) m)) m)))
+
+(defn mr-iter [n a]
+  (cond
+    (> a (/ n 2)) true ; check first half of numbers to guarantee we find a non-trivial sqrt of 1 mod n
+    (= (expmod-mr a (dec n) n) 1) (recur n (inc a))
+    :else false))
+
+(defn mr-prime? [n]
+  (if (< n 2)
+    false
+    (mr-iter n 1)))
+
+; Use Miller-Rabin test to find first 10 primes
+(take 10 (filter mr-prime? (range)))
+(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47)
+
+; User Miller-Rabin test to check the 12 primes from previous exercises
+(map mr-prime? primes-to-time)
+; (true true true true true true true true true true true true)
+
+; Check that the first 10 Carmichael numbers don't fool the Miller-Rabin test
+(map mr-prime? (first-n-carm 10))
+; (false false false false false false false false false false)
