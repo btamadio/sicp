@@ -532,9 +532,6 @@
 
 ; Exercise 1.28
 
-#_(defn is-sqrt1-mod [x m]
-  (and (= (mod (square x) m) 1) (not= x (dec m)) (not= x 1)))
-
 (defn expmod-mr [base exp m]
   (cond
     (= exp 0) 1
@@ -558,7 +555,7 @@
 
 ; Use Miller-Rabin test to find first 10 primes
 (take 10 (filter mr-prime? (range)))
-(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47)
+; (2 3 5 7 11 13 17 19 23 29 31 37 41 43 47)
 
 ; User Miller-Rabin test to check the 12 primes from previous exercises
 (map mr-prime? primes-to-time)
