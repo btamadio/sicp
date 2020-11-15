@@ -494,13 +494,7 @@
 ; 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000949N
 ; 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001243N]
 
-(doseq [x big-primes]
-  (println x)
-  (time (fermat-prime? x 1000)))
-
-; These 100-digit primes take about 1 second to check (using 1000 random ints each time)
-
-; Ex 1.25
+; Exercise 1.25
 
 (defn bad-exp-mod [base exp m]
   (mod (fast-expt base exp) m))
@@ -508,3 +502,31 @@
 ; This won't work for testing for primes because the result of (fast-expt base exp) will be too big
 ; and we'll get an Integer Overflow. In expmod, we take the remainder at each iteration, so we never
 ; have such huge numbers.
+
+; Exercise 1.26
+; Since the multiplication function takes two arguments, each of those arguments has
+; to be evaluated separately when calling it. Previously, with the call to square, we only
+; had to evaluate a single argument, which square copies when it calls the multiply function
+
+; Exercise 1.27
+
+(defn carm-iter [n a]
+  (cond
+    (= a n) true
+    (= (expmod a n n) a) (recur n (inc a))
+    :else false))
+
+(defn is-carm? [n]
+  (and  (not (prime? n)) (carm-iter n 1)))
+
+(map is-carm? [561 1105 1729 2465 2821 6601])
+; (true true true true true true)
+
+; Find first N Carmichael numbers:
+
+(defn first-n-carm [n]
+  (take n (filter is-carm? (range))))
+
+(first-n-carm 10)
+; (561 1105 1729 2465 2821 6601 8911 10585 15841 29341)
+
