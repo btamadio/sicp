@@ -313,3 +313,64 @@
 ; 2
 
 ; Applicative order total: 4 remainders computed
+
+; Exercise 1.21
+
+(defn divides? [a b]
+  (= (mod b a) 0))
+
+(defn find-divisor [n test-divisor]
+  (cond
+    (> (* test-divisor test-divisor) n) n
+    (divides? test-divisor n) test-divisor
+    :else (find-divisor n (+ test-divisor 1))))
+
+(defn smallest-divisor [n]
+  (find-divisor n 2))
+
+(smallest-divisor 199)
+; => 199
+
+(smallest-divisor 1999)
+; => 1999
+
+(smallest-divisor 19999)
+; => 7
+
+; Exercise 1.22
+(defn prime? [n]
+  (= n (smallest-divisor n)))
+
+(defn prime-search-iter [check result n]
+  (cond
+    (= n (count result)) result
+    (prime? check) (recur (+ check 1) (conj result check) n)
+    :else (recur (+ check 1) result n)))
+
+(defn search-for-primes [start n]
+  "Finds the first n primes greater than start"
+  (prime-search-iter (+ start 1) [] n))
+
+(time (search-for-primes 100 3))
+; => [101 103 107]
+; "Elapsed time: 0.046835 msecs"
+
+(time (search-for-primes 10000 3))
+; => [10007 10009 10037]
+; "Elapsed time: 0.20075 msecs
+; About 4x time
+
+(time (search-for-primes 100000 3))
+; => [100003 100019 100043]
+; "Elapsed time: 0.468423 msecs"
+; About 2.3x time
+
+(time (search-for-primes 1000000 3))
+; => [1000003 1000033 1000037]
+; "Elapsed time 0.981945 msecs"
+; About 2.1x time
+
+(time (search-for-primes 10000000 3))
+; "Elapsed time 4.003401 msecs"
+
+; Scales very roughly like O(sqrt(N)) as expected
