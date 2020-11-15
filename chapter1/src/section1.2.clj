@@ -351,14 +351,14 @@
   "Finds the first n primes greater than start"
   (prime-search-iter (+ start 1) [] n))
 
-(time (search-for-primes 100 3))
-; => [101 103 107]
-; "Elapsed time: 0.046835 msecs"
+(time (search-for-primes 1000 3))
+; => [1009 1013 1019]
+; "Elapsed time: 0.080212 msecs"
 
 (time (search-for-primes 10000 3))
 ; => [10007 10009 10037]
 ; "Elapsed time: 0.20075 msecs
-; About 4x time
+; About 2.5x time
 
 (time (search-for-primes 100000 3))
 ; => [100003 100019 100043]
@@ -370,7 +370,93 @@
 ; "Elapsed time 0.981945 msecs"
 ; About 2.1x time
 
-(time (search-for-primes 10000000 3))
-; "Elapsed time 4.003401 msecs"
+; Actually a litte better than O(sqrt(N))
 
-; Scales very roughly like O(sqrt(N)) as expected
+; Exercise 1.23
+
+(defn next [x]
+  (if (= x 2) 3 (+ x 2)))
+
+(defn fast-find-divisor [n test-divisor]
+  (cond
+    (> (* test-divisor test-divisor) n) n
+    (divides? test-divisor n) test-divisor
+    :else (find-divisor n (next test-divisor))))
+
+(defn fast-smallest-divisor [n]
+  (fast-find-divisor n 2))
+
+(defn fast-prime? [n]
+  (= n (fast-smallest-divisor n)))
+
+(defn fast-prime-search-iter [check result n]
+  (cond
+    (= n (count result)) result
+    (fast-prime? check) (recur (+ check 1) (conj result check) n)
+    :else (recur (+ check 1) result n)))
+
+(defn fast-search-for-primes [start n]
+  "Finds the first n primes greater than start"
+  (fast-prime-search-iter (+ start 1) [] n))
+
+(time (fast-search-for-primes 1000 3))
+; "Elapsed time 0.110545 msecs"
+; Slightly slower
+
+(time (fast-search-for-primes 10000 3))
+; "Elapsed time 0.244223 msecs"
+; Not any faster
+
+(time (fast-search-for-primes 100000 3))
+; "Elapsed time 0.45364 msecs"
+; Not any faster
+
+(time (fast-search-for-primes 1000000 3))
+; "Elapsed time 0.970805 msec"
+; Not any faster
+
+; We are potentially saving time by skipping divisors
+; But we are adding an extra if statement that has to be evaluated every time next is called
+
+; Exercise 1.24
+
+(defn expmod [base exp m]
+  (cond
+    (= exp 0) 1
+    (even? exp) (mod (square (expmod base (/ exp 2) m)) m)
+    :else (mod (* base (expmod base (- exp 1) m)) m)))
+
+(defn fermat-test [n]
+  (defn try-it [a]
+    (= (expmod a n n) a))
+  (try-it (+ 1 (rand-int (- n 1)))))
+
+(defn fermat-prime? [n times]
+  (cond
+    (= times 0) true
+    (fermat-test n) (recur n (- times 1))
+    :else false))
+
+(defn fermat-prime-search-iter [check result n times]
+  (cond
+    (= n (count result)) result
+    (fermat-prime? check times) (recur (+ check 1) (conj result check) n times)
+    :else (recur (+ check 1) result n times)))
+
+(defn fermat-search-for-primes [start n times]
+  "Finds the first n primes greater than start"
+  (fermat-prime-search-iter (+ start 1) [] n times))
+
+(time (fermat-search-for-primes 1000 3 1))
+; "Elapsed time: 0.130586 msecs"
+
+(time (fermat-search-for-primes 10000 3 1))
+; "Elapsed time: 0.326091 msecs"
+
+(time (fermat-search-for-primes 100000 3 1))
+; "Elapsed time: 0.432236 msecs"
+
+(time (fermat-search-for-primes 1000000 3 1))
+; "Elapsed time: 0.414412 msecs
+
+; Testing for primes near 1000000 takes about 3x longer than testing for primes near 1000, which is as expected
