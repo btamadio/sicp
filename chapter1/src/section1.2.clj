@@ -351,26 +351,42 @@
   "Finds the first n primes greater than start"
   (prime-search-iter (+ start 1) [] n))
 
-(time (search-for-primes 1000 3))
-; => [1009 1013 1019]
-; "Elapsed time: 0.080212 msecs"
+(map #(search-for-primes % 3) [1000 10000 100000 1000000])
+;([1009 1013 1019]
+; [10007 10009 10037]
+; [100003 100019 100043]
+; [1000003 1000033 1000037])
 
-(time (search-for-primes 10000 3))
-; => [10007 10009 10037]
-; "Elapsed time: 0.20075 msecs
-; About 2.5x time
+(def primes-to-time (flatten (map #(search-for-primes % 3) [1000 10000 100000 1000000])))
 
-(time (search-for-primes 100000 3))
-; => [100003 100019 100043]
-; "Elapsed time: 0.468423 msecs"
-; About 2.3x time
+(doseq [x primes-to-time]
+  (println x)
+  (time (prime? x)))
 
-(time (search-for-primes 1000000 3))
-; => [1000003 1000033 1000037]
-; "Elapsed time 0.981945 msecs"
-; About 2.1x time
+;  prime  |  time (ms)
+; -------------------
+; 1009    |  0.019196
+; 1013    |  0.009285
+; 1019    |  0.009031
+; 10007   |  0.025027
+; 10009   |  0.022945
+; 10037   |  0.023042
+; 100003  |  0.072444
+; 100019  |  0.070117
+; 100043  |  0.070009
+; 1000003 |  0.224492
+; 1000033 |  0.197744
+; 1000037 |  0.196534
 
-; Actually a litte better than O(sqrt(N))
+; The data support approximately O(sqrt(N)) growth
+; The fact that 1009 takes longer than 1013 is probably
+; because of Clojure's memoization, which stores intermediate results
+; when a function is called to speed up computation when the same
+; function is called again with the same arguments. In this case,
+; we are probably seeing the evaluations of mod being memoized. This same
+; reason explains why 10009 took a little longer than 10037. Some of
+; the evaluations of mod were memoized when checking the smaller numbers,
+; but many more evaluations had to be done when reaching a new order of magnitude.
 
 ; Exercise 1.23
 
@@ -389,34 +405,28 @@
 (defn fast-prime? [n]
   (= n (fast-smallest-divisor n)))
 
-(defn fast-prime-search-iter [check result n]
-  (cond
-    (= n (count result)) result
-    (fast-prime? check) (recur (+ check 1) (conj result check) n)
-    :else (recur (+ check 1) result n)))
+(doseq [x primes-to-time]
+  (println x)
+  (time (fast-prime? x)))
 
-(defn fast-search-for-primes [start n]
-  "Finds the first n primes greater than start"
-  (fast-prime-search-iter (+ start 1) [] n))
+;  prime  |  time (ms)
+; --------------------
+; 1009    |  0.041022
+; 1013    |  0.012308
+; 1019    |  0.011344
+; 10007   |  0.028118
+; 10009   |  0.027167
+; 10037   |  0.027292
+; 100003  |  0.100743
+; 100019  |  0.077622
+; 100043  |  0.077412
+; 1000003 |  0.234968
+; 1000033 |  0.23596
+; 1000037 |  0.213353
 
-(time (fast-search-for-primes 1000 3))
-; "Elapsed time 0.110545 msecs"
-; Slightly slower
 
-(time (fast-search-for-primes 10000 3))
-; "Elapsed time 0.244223 msecs"
-; Not any faster
-
-(time (fast-search-for-primes 100000 3))
-; "Elapsed time 0.45364 msecs"
-; Not any faster
-
-(time (fast-search-for-primes 1000000 3))
-; "Elapsed time 0.970805 msec"
-; Not any faster
-
-; We are potentially saving time by skipping divisors
-; But we are adding an extra if statement that has to be evaluated every time next is called
+; We are saving time by skipping divisors, but we adding an extra if statement 
+; that has to be evaluated every time next is called
 
 ; Exercise 1.24
 
@@ -426,16 +436,47 @@
     (even? exp) (mod (square (expmod base (/ exp 2) m)) m)
     :else (mod (* base (expmod base (- exp 1) m)) m)))
 
+; If we want to look at really big primes, we have to use a function
+; that can give us bigger random numbers than the built-in rand-int
+(defn rand-bigint [n]
+  (bigint (bigdec (rand n))))
+
 (defn fermat-test [n]
   (defn try-it [a]
     (= (expmod a n n) a))
-  (try-it (+ 1 (rand-int (- n 1)))))
+  (try-it (+ 1 (rand-bigint (- n 1)))))
 
 (defn fermat-prime? [n times]
   (cond
     (= times 0) true
     (fermat-test n) (recur n (- times 1))
     :else false))
+
+(doseq [x primes-to-time]
+  (println x)
+  (time (fermat-prime? x 1000)))
+
+
+;  prime  |  time (ms)
+; --------------------
+; 1009    |  6.504148
+; 1013    |  6.612591
+; 1019    |  6.423497
+; 10007   |  8.700837
+; 10009   |  7.217906
+; 10037   |  7.469801
+; 100003  |  9.095217
+; 100019  |  9.109494
+; 100043  |  8.276873
+; 1000003 |  10.411793
+; 1000033 |  9.499783
+; 1000037 |  10.115866
+
+; Observed scaling is better than O(log(N))
+; Could be dominated by random number generation
+; which is constant
+
+; Just for fun lets search for some really big primes
 
 (defn fermat-prime-search-iter [check result n times]
   (cond
@@ -447,16 +488,14 @@
   "Finds the first n primes greater than start"
   (fermat-prime-search-iter (+ start 1) [] n times))
 
-(time (fermat-search-for-primes 1000 3 1))
-; "Elapsed time: 0.130586 msecs"
+(def big-primes (fermat-search-for-primes (bigint (java.lang.Math/pow 10 100)) 3 100))
 
-(time (fermat-search-for-primes 10000 3 1))
-; "Elapsed time: 0.326091 msecs"
+;[10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000267N
+; 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000949N
+; 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001243N]
 
-(time (fermat-search-for-primes 100000 3 1))
-; "Elapsed time: 0.432236 msecs"
+(doseq [x big-primes]
+  (println x)
+  (time (fermat-prime? x 1000)))
 
-(time (fermat-search-for-primes 1000000 3 1))
-; "Elapsed time: 0.414412 msecs
-
-; Testing for primes near 1000000 takes about 3x longer than testing for primes near 1000, which is as expected
+; These 100-digit primes take about 1 second to check (using 1000 random ints each time)
