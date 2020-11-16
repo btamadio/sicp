@@ -93,3 +93,32 @@
 
 (pi-prod 10000)
 ; => 3.1417497371492673
+
+; Exercise 1.32
+
+; As a recursive process
+(defn accumulate [combiner null-value term a next b]
+  (if (> a b)
+    null-value
+    (combiner (term a)
+       (accumulate combiner null-value term (next a) next b))))
+
+; As an iterative process
+(defn accumulate [combiner null-value term a next b]
+  (defn iter [a result]
+    (if (> a b)
+      result
+      (iter (next a) (combiner result (term a)))))
+  (iter a null-value))
+
+(defn sum [term a next b]
+  (accumulate + 0 term a next b))
+
+(defn prod [term a next b]
+  (accumulate * 1 term a next b))
+
+(sum square 1 inc 7)
+; => 140
+
+(prod identity 1 inc 4)
+; => 24
