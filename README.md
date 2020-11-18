@@ -1,3 +1,3 @@
-# SICP
+# Structure and Intrepretation of Computer Programs
 
-Exercises from Structure and Interpretation of Computer Programs, done in Clojure.
+Clojure solutions to the exercises in SICP
