@@ -156,3 +156,23 @@
 
 (prod-rel-primes 6)
 ; 5
+
+; Exercise 1.34
+
+(defn f [g]
+  (g 2))
+
+(f square)
+; => 4
+
+(f (fn [z] (* z (+ z 1))))
+; => 6
+
+; What if we ask for:
+#_(f f)
+
+; The interprefer first evaluates the argument 'f', which evaluates to a function (call this lambda)
+; Then the interpreter applies the function f to lambda, which results in (lambda 2)
+; However this cannot be evaluated, since lambda expects its argument to be a function, and instead it gets a number
+; So we get a type error
+
