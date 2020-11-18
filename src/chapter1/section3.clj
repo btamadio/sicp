@@ -1,5 +1,5 @@
-(ns section3
-  (:require [chapter1.section2]))
+(ns chapter1.section3
+  (:require [chapter1.section2 :refer [prime? gcd]]))
 
 ; Exercise 1.29: Simpson's rule
 
@@ -126,12 +126,33 @@
 
 ; Exercise 1.33
 
-(defn accumulate-filter [combiner null-value term a next b filter]
+(defn accumulate-filter [combiner null-value term a next b filter-func]
   (defn iter [a result]
     (if (> a b)
       result
-      (recur (next a) (if (filter (term a))
+      (recur (next a) (if (filter-func a)
                         (combiner result (term a))
                         result))))
   (iter a null-value))
 
+(defn square [x] (* x x))
+
+(defn sum-squared-primes [a b]
+  (accumulate-filter + 0 square a inc b prime?))
+
+(sum-squared-primes 1 10)
+; 87
+
+(defn rel-prime [i n]
+  (= (gcd i n) 1))
+
+(defn prod-rel-primes [n]
+  (defn rel-prime-n? [i]
+    (rel-prime i n))
+  (accumulate-filter * 1 identity 1 inc n rel-prime-n?))
+
+(prod-rel-primes 5)
+; 24
+
+(prod-rel-primes 6)
+; 5

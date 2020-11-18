@@ -1,4 +1,4 @@
-(ns section1)
+(ns chapter1.section1)
 
 ; Exercise 1.1
 

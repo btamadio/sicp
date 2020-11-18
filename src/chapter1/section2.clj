@@ -1,4 +1,4 @@
-(ns section2)
+(ns chapter1.section2)
 
 ; Exercise 1.9
 
@@ -339,7 +339,7 @@
 
 ; Exercise 1.22
 (defn prime? [n]
-  (= n (smallest-divisor n)))
+  (and (> n 1) (= n (smallest-divisor n))))
 
 (defn prime-search-iter [check result n]
   (cond
