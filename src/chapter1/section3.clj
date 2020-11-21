@@ -1,5 +1,4 @@
-(ns chapter1.section3
-  (:require [chapter1.section2 :refer [prime? gcd]]))
+(ns chapter1.section3)
 
 ; Exercise 1.29: Simpson's rule
 
@@ -137,11 +136,30 @@
 
 (defn square [x] (* x x))
 
+(defn divides? [a b]
+  (= (mod b a) 0))
+
+(defn find-divisor [n test-divisor]
+  (cond
+    (> (* test-divisor test-divisor) n) n
+    (divides? test-divisor n) test-divisor
+    :else (find-divisor n (+ test-divisor 1))))
+
+(defn smallest-divisor [n]
+  (find-divisor n 2))
+
+(defn prime? [n]
+  (and (> n 1) (= n (smallest-divisor n))))
+
 (defn sum-squared-primes [a b]
   (accumulate-filter + 0 square a inc b prime?))
 
 (sum-squared-primes 1 10)
 ; 87
+
+(defn gcd [a b]
+  (if (= b 0) a
+      (recur b (mod a b))))
 
 (defn rel-prime [i n]
   (= (gcd i n) 1))
@@ -176,3 +194,58 @@
 ; However this cannot be evaluated, since lambda expects its argument to be a function, and instead it gets a number
 ; So we get a type error
 
+; Exercise 1.35
+
+; Show golden ratio (phi) is fixed point of f(x) = 1 + 1/x
+; 1 + 1/x = x 
+;   => x^2 - x - 1 = 0
+;   => use quadratic formula to get x = (1 + sqrt(5))/2 as one of the roots
+
+; Use fixed point function to compute golden ratio
+
+(def tolerance 0.00001)
+
+(defn fixed-point [f first-guess]
+  (defn close-enough? [v1 v2]
+    (< (Math/abs (- v1 v2)) tolerance))
+  (defn try-guess [guess]
+    (let [next (f guess)]
+      (if (close-enough? guess next)
+        next
+        (try-guess next))))
+  (try-guess first-guess))
+
+(fixed-point (fn [x] (+ 1 (/ 1 x))) 1.0)
+; => 1.6180327868852458
+
+; Exercise 1.36
+
+(defn fixed-point [f first-guess]
+  (defn close-enough? [v1 v2]
+    (< (Math/abs (- v1 v2)) tolerance))
+  (defn try-guess [guess]
+    (let [next (f guess)]
+      (println next)
+      (if (close-enough? guess next)
+        next
+        (try-guess next))))
+  (try-guess first-guess))
+
+(defn fixed-point-damped [f first-guess]
+  (defn close-enough? [v1 v2]
+    (< (Math/abs (- v1 v2)) tolerance))
+  (defn try-guess-damped [guess]
+    (let [next (/ (+ guess (f guess)) 2)]
+      (println next)
+      (if (close-enough? guess next)
+        next
+        (try-guess-damped next))))
+  (try-guess-damped first-guess))
+
+; (fixed-point #(/ (Math/log 1000) (Math/log %)) 4.5)
+; 4.555539595243813
+; Without damping: 23 steps
+
+; (fixed-point-damped #(/ (Math/log 1000) (Math/log %)) 4.5)
+; 4.555534397165625
+; With damping: 5 steps
