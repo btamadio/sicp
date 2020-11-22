@@ -273,3 +273,12 @@
 (cont-frac (constantly 1.0) (constantly 1.0) 11)
 ;  => 0.6180555555555556
 
+; Exercise 1.38
+(defn euler-d [i]
+  (if (= 0 (mod (- i 1) 3))
+    (* 2 (/ (+ i 2) 3))
+    1))
+
+(cont-frac (constantly 1.0) euler-d 100)
+; => 0.7182818284590453
+
