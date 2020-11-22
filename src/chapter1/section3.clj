@@ -249,3 +249,27 @@
 ; (fixed-point-damped #(/ (Math/log 1000) (Math/log %)) 4.5)
 ; 4.555534397165625
 ; With damping: 5 steps
+
+; Exercise 1.37
+; a. As a recursive process
+(defn cont-frac-recur [n d k]
+  (defn iter [i]
+    (if (= i (dec k))
+      (/ (n i) (d i))
+      (/ (n i) (+ (d i) (iter (inc i))))))
+  (iter 0))
+
+(cont-frac-recur (constantly 1.0) (constantly 1.0) 11)
+;  => 0.6180555555555556
+; k = 11 is the smallest value that is correct to 4 decimal places
+
+(defn cont-frac [n d k]
+  (defn iter [result i]
+    (if (< i 0)
+      result
+      (recur (/ (n i) (+ (d i) result)) (dec i))))
+  (iter 0 (dec k)))
+
+(cont-frac (constantly 1.0) (constantly 1.0) 11)
+;  => 0.6180555555555556
+
