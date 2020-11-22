@@ -282,3 +282,12 @@
 (cont-frac (constantly 1.0) euler-d 100)
 ; => 0.7182818284590453
 
+; Exercise 1.39
+(defn tan-cf [x k]
+  (defn n [i]
+    (if (= i 0) x (* -1 (* x x))))
+  (defn d [i] (+ (* 2 i) 1.0))
+  (cont-frac n d k))
+
+(tan-cf 1 100)
+; => 1.557407724654902
