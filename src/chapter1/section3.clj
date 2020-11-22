@@ -225,7 +225,7 @@
     (< (Math/abs (- v1 v2)) tolerance))
   (defn try-guess [guess]
     (let [next (f guess)]
-      (println next)
+      #_(println next)
       (if (close-enough? guess next)
         next
         (try-guess next))))
@@ -236,7 +236,7 @@
     (< (Math/abs (- v1 v2)) tolerance))
   (defn try-guess-damped [guess]
     (let [next (/ (+ guess (f guess)) 2)]
-      (println next)
+      #_(println next)
       (if (close-enough? guess next)
         next
         (try-guess-damped next))))
@@ -291,3 +291,86 @@
 
 (tan-cf 1 100)
 ; => 1.557407724654902
+
+; Exercise 1.40
+(defn deriv [g]
+  (let [dx 0.00001]
+    (fn [x]
+      (/ (- (g (+ x dx)) (g x)) dx))))
+
+(defn newton-transform [g]
+  (fn [x]
+    (- x (/ (g x) ((deriv g) x)))))
+
+(defn newtons-method [g guess]
+  (fixed-point (newton-transform g) guess))
+
+(defn cubic [a b c]
+  (fn [x]
+    (+ (cube x) (* a (square x)) (* b x) c)))
+
+; Exercise 1.41
+
+(defn double [g]
+  (fn [x]
+    (g (g x))))
+
+(((double (double double)) inc) 5)
+; => 21
+
+; Exercise 1.42
+
+(defn compose [f g]
+  (fn [x] (f (g x))))
+
+((compose square inc) 6)
+
+; Exercise 1.43
+(defn repeated [f n]
+  (if (= n 1)
+    f
+    (compose f (repeated f (dec n)))))
+
+; Exercise 1.44
+
+(defn smooth [f]
+  (let [dx 0.00001]
+    (fn [x]
+      (/ (+ (f x) (f (+ x dx)) (- x dx)) 3.0))))
+
+(defn n-fold-smoothed [f n]
+  (fn [x]
+    (((repeated smooth n) f) x)))
+
+; Exercise 1.45
+
+(defn average [a b]
+  (/ (+ a b) 2))
+
+(defn average-damp [f]
+  (fn [x] (average x (f x))))
+
+; Based on some trial and error, average damping n-2 times is the minimum for convergence
+(defn nth-root [x n]
+  (fixed-point ((repeated average-damp (- n 2)) (fn [y] (/ x (Math/pow y (dec n))))) 1.0))
+
+; Exercise 1.46
+(defn iterative-improve [good-enough? improve]
+  (fn [guess]
+    (if (good-enough? guess)
+      guess
+      (recur (improve guess)))))
+
+(defn sqrt [x]
+  (defn good-enough? [guess]
+    (< (Math/abs (- (square guess) x)) 0.001))
+  (defn improve [guess]
+    (average guess (/ x guess)))
+  ((iterative-improve good-enough? improve) 1.0))
+
+(defn fixed-point [f]
+  (defn good-enough? [guess]
+    (< (Math/abs (- (f guess) guess)) 0.0001))
+  (defn improve [guess]
+    (f guess))
+  ((iterative-improve good-enough? improve) 1.0))
