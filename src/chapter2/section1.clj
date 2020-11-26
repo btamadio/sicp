@@ -133,3 +133,92 @@
 
 (cdr (cons-proc 1 2))
 ; => 2
+
+; Exercise 2.5
+
+(defn cons-exp [x y]
+  (* (Math/pow 2 x) (Math/pow 3 y)))
+
+(defn factorize [z p]
+  (defn fact-iter [z p res]
+    (if (not= 0 (int (mod z p)))
+      res
+      (recur (/ z p) p (inc res))))
+  (fact-iter z p 0))
+
+(defn car-exp [z]
+  (factorize z 2))
+
+(defn cdr-exp [z]
+  (factorize z 3))
+
+(car-exp (cons-exp 3 5))
+; => 3
+
+(cdr-exp (cons-exp 3 5))
+; => 5
+
+(car-exp (cons-exp 12 14))
+; => 12
+
+(cdr-exp (cons-exp 12 14))
+; => 14
+
+; Exercise 2.6
+
+(def zero
+  (fn [f]
+    (fn [x] x)))
+
+(defn add-1 [n]
+  (fn [f]
+    (fn [x] (f ((n f) x)))))
+
+; Evaluate (add-1 zero) with substitution method:
+; (add-1 zero)
+; (fn [f] (fn [x] (f ((zero f) x))))
+; (fn [f] (fn [x] (f (((fn [f] (fn [x] x)) f) x))))
+
+; (fn [f] (fn [x] (f ((fn [x] x) x))))
+; (fn [f] (fn [x] (f ((fn [x] x) x))))
+; (fn [f] (fn [x] (f x)))
+
+; So (add-1 zero) gives a function that applies a function f to x once
+
+; We can check this by passing the successor function and and 0:
+(((add-1 zero) inc) 0)
+; => 1
+
+; The number 2 is represented by applying a function twice:
+(def two
+  (fn [f]
+    (fn [x]
+      (f (f x)))))
+
+((two inc) 0)
+; => 2
+
+; (plus m n) should then mean applying the function m+n times
+(defn plus [m n]
+  (fn [f]
+    (fn [x]
+      ((m f) ((n f) x)))))
+
+(def one (add-1 zero))
+(def two (add-1 (add-1 zero)))
+
+(((plus one two) inc) 0)
+; => 3
+
+(((plus one one) inc) 0)
+; => 2
+
+(def four (plus two two))
+
+((four inc) 0)
+; => 4
+
+(def six (plus four two))
+((six inc) 0)
+; => 6
+
