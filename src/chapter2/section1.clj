@@ -45,7 +45,9 @@
 
 ; Exercise 2.3
 
-; We'll need this function to compute the length of a segment
+; We'll need the len-segment function for computing perimeter and area
+(defn square [x] (* x x))
+
 (defn len-segment [segment]
   (Math/sqrt (+ (square (- (y-point (end-segment segment)) (y-point (start-segment segment))))
                 (square (- (x-point (start-segment segment)) (x-point (end-segment segment)))))))
@@ -55,7 +57,7 @@
   "base is a segment, height is a number"
   (pair base height))
 
-(defn square [x] (* x x))
+
 
 (defn height-rect [rect]
   (second rect))
@@ -97,3 +99,37 @@
 (perim-rect r1)
 ; => 14.0
 
+; Exercise 2.4
+
+; (defn cons [x y]
+;   (fn [m] (m x y)))
+
+; (defn car [z]
+;   (z (fn [p q] p)))
+
+; Using substitution model:
+; (car (cons a b))
+; (car (fn [m] (m a b)))
+; ((fn [m] (m a b)) (fn [p q] p))
+; ((fn [p q] p) a b)
+; a
+; So, (car (cons a b)) => a, as required
+
+; Definition of cdr in this representation:
+; (defn cdr [z] (z (fn [p q] q)))
+
+; Let's verify programatically as well:
+(defn cons-proc [x y]
+  (fn [m] (m x y)))
+
+(defn car [z]
+  (z (fn [p q] p)))
+
+(defn cdr [z]
+  (z (fn [p q] q)))
+
+(car (cons-proc 1 2))
+; => 1
+
+(cdr (cons-proc 1 2))
+; => 2
