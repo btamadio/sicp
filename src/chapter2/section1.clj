@@ -204,21 +204,26 @@
     (fn [x]
       ((m f) ((n f) x)))))
 
+; Use currying to make it a function of one argument, consistent with Lambda calculus:
+(defn plus [m]
+  (fn [n]
+    (fn [f]
+      (fn [x]
+        ((m f) ((n f) x))))))
+
 (def one (add-1 zero))
 (def two (add-1 (add-1 zero)))
 
-(((plus one two) inc) 0)
+((((plus one) two) inc) 0)
 ; => 3
 
-(((plus one one) inc) 0)
+((((plus one) one) inc) 0)
 ; => 2
 
-(def four (plus two two))
-
+(def four ((plus two) two))
 ((four inc) 0)
 ; => 4
 
-(def six (plus four two))
+(def six ((plus four) two))
 ((six inc) 0)
 ; => 6
-
