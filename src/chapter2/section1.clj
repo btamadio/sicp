@@ -227,3 +227,99 @@
 (def six ((plus four) two))
 ((six inc) 0)
 ; => 6
+
+; Exercise 2.7
+
+(defn lower-bound [interval]
+  (first interval))
+
+(defn upper-bound [interval]
+  (second interval))
+
+(defn make-interval [a b]
+  (pair a b))
+
+(defn add-interval [x y]
+  (make-interval (+ (lower-bound x) (lower-bound y))
+                 (+ (upper-bound x) (upper-bound y))))
+
+(defn mul-interval [x y]
+  (let [p1 (* (lower-bound x) (lower-bound y))
+        p2 (* (lower-bound x) (upper-bound y))
+        p3 (* (upper-bound x) (lower-bound y))
+        p4 (* (upper-bound x) (upper-bound y))]
+    (make-interval (min p1 p2 p3 p4) (max p1 p2 p3 p4))))
+
+(add-interval (make-interval 1 2) (make-interval 3 4))
+; => [4 6]
+
+; Exercise 2.8
+
+(defn subtract-interval [x y]
+  (make-interval (- (lower-bound x) (upper-bound y))
+                 (- (upper-bound x) (lower-bound y))))
+
+(subtract-interval (make-interval 1.5 2.0) (make-interval 0.2 0.3))
+; => [1.2 1.8]
+
+; Exercise 2.9
+; We can show that width of the sum of two intervals is equal to the sum of the widths of the intervals:
+; width(sum(x,y)) = 0.5 * (upper(sum(x,y)) - lower(sum(x,y)))
+;                 = 0.5 * (upper(x) + upper(y) - lower(x) - lower(y))
+;                 = width(x) + width(y)
+
+(defn width-interval [x]
+  (/ (- (upper-bound x) (lower-bound x)) 2))
+
+(width-interval (make-interval 0.5 3.0))
+; => 1.25
+
+(def int1 (make-interval 1.6 2.9))
+(def int2 (make-interval 0.25 0.4))
+
+; The width of the sum of intervals is the sum of widths of the intervals:
+(width-interval (add-interval int1 int2))
+; => 0.7249999999999999
+
+(+ (width-interval int1) (width-interval int2))
+; => 0.7249999999999999
+
+(width-interval (mul-interval int1 int2))
+; => 0.37999999999999995
+
+; This is not true for multiplication.
+
+; As a counterexample, consider intervals 3 and 4, which have the same widths as intervals 1 and 2
+; The product of intervals 3 and 4 has a different width than the product of intervals 1 and 2
+(def int3 (make-interval 0 1.3))
+(def int4 (make-interval 0.15 0.3))
+
+(width-interval int1)
+; => 0.6499999999999999
+
+(width-interval int2)
+; => 0.07500000000000001
+
+(width-interval int3)
+; => 0.65
+
+(width-interval int4)
+; => 0.075
+
+(width-interval (mul-interval int1 int2))
+; => 0.37999999999999995
+
+(width-interval (mul-interval int3 int4))
+; => 0.195
+
+; Exercise 2.10
+
+(defn div-interval [x y]
+  (if (and (<= (lower-bound y) 0) (>= (upper-bound y) 0))
+    (throw (Exception. "division by zero"))
+    (mul-interval x
+                  (make-interval (/ 1.0 (upper-bound y))
+                                 (/ 1.0 (lower-bound y))))))
+
+
+
