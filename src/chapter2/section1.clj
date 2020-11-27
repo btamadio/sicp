@@ -343,3 +343,16 @@
     (and (contains-zero? x) (neg-interval? y)) (make-interval (* (upper-bound x) (lower-bound y)) (* (lower-bound x) (lower-bound y)))
     (and (contains-zero? x) (contains-zero? y)) (mul-interval x y)))
 
+; Exercise 2.12
+
+(defn make-center-percent [c p]
+  (make-interval (- c (* p c)) (+ c (* p c))))
+
+(defn center [i]
+  (/ (+ (lower-bound i) (upper-bound i)) 2))
+
+(defn width [i]
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+(defn percent [i]
+  (/ (width i) (center i)))
