@@ -51,7 +51,7 @@
 
 ; Exercise 2.20
 
-; Without using filter?, we have to iterate, cons if parity matches,
+; Without using filter, we have to iterate, cons if parity matches,
 ; and then reverse the list before returning (since cons adds terms by prepending)
 (defn same-parity [x & others]
   (loop [remaining others
