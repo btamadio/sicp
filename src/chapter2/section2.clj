@@ -63,3 +63,35 @@
 ; A much simpler version, using filter:
 (defn same-parity-simple [x & others]
   (cons x (filter #(= (even? x) (even? %)) others)))
+
+; Exercise 2.21
+(defn square [x]
+  (* x x))
+
+(defn square-list [items]
+  (if (empty? items) ()
+      (cons (square (first items)) (square-list (rest items)))))
+
+(square-list (list 1 2 3 4))
+; => (1 4 9 16)
+
+(defn square-list [items]
+  (map square items))
+
+(square-list (list 1 2 3 4))
+; => (1 4 9 16)
+
+; 2.22
+; It returns results in reverse order because the answer is constructed by prepending
+; The second method doesn't work either because answer is initially nil,
+; So the first iteration tries to do: (cons nil (square (car things)))
+; So the car of answer will point to nil
+
+; 2.23
+
+(defn for-each [proc items]
+  (loop [remaining items]
+    (if (empty? remaining) nil
+        (do
+          (proc (first remaining))
+          (recur (rest remaining))))))
