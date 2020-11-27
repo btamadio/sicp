@@ -356,3 +356,68 @@
 
 (defn percent [i]
   (/ (width i) (center i)))
+
+; Exercise 2.13
+
+; With some algebra, one can show that for small percent tolerances:
+; (percent (mul-interval x y)) is approximately (+ (percent x) (percent y))
+
+; We can check with some test cases
+
+(def int-test1 (make-center-percent 2.0 0.01))
+(def int-test2 (make-center-percent 4.5 0.05))
+
+(percent (mul-interval int-test1 int-test2))
+; => 0.05997001499250365
+
+(+ (percent int-test1) (percent int-test2))
+; => 0.05999999999999993
+
+; Exercise 2.14
+
+(defn par1 [r1 r2]
+  (div-interval (mul-interval r1 r2)
+                (add-interval r1 r2)))
+
+(defn par2 [r1 r2]
+  (let [one (make-interval 1 1)]
+    (div-interval one
+                  (add-interval
+                   (div-interval one r1)
+                   (div-interval one r2)))))
+
+(par1 int1 int2)
+; => [0.12121212121212122 0.6270270270270268]
+
+(par2 int1 int2)
+; => [0.21621621621621623 0.3515151515151515]
+
+(def inta (make-center-percent 4 0.04))
+(def intb (make-center-percent 2 0.01))
+
+(div-interval inta inta)
+; => [0.9230769230769229 1.0833333333333335]
+
+(div-interval inta intb)
+; => [1.900990099009901 2.101010101010101]
+
+; Dividing an interval by itself doesn't give 1! 
+; This is because the lower bound of the result is taking the lower bound of inta
+; in the numerator and the upper bound of inta in the denominator.
+; This is incorrect because it is treating the two occurrences of inta as independent,
+; when in reality, the ratio A/A will always be 1 for any given measurement A
+
+; Exercise 2.15
+; Yes, Alyssa is solving the "dependency problem" that arises
+; when an interval occurs more than once in a formula and the occurrences are treated independently.
+; For example, the lower bound of par1 corresponds to R1 being at its lower bound in the numerator
+; but simulatenously at its upper bound in the denominator (and likewise for R2). Since R1 is in reality one measurement,
+; treating its two occurences as independent will overestimate the resulting interval.
+; par2 is a "better" program because it does not suffer from this deficiency.
+
+
+; Exercise 2.16
+; Already answered the first part of this question as my answer to 2.15
+; According to some quick Googling, there are some methods for solving this problem automatically
+; but it is not always possible.
+
