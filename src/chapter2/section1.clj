@@ -313,13 +313,33 @@
 ; => 0.195
 
 ; Exercise 2.10
+(defn contains-zero? [interval]
+  (and (<= (lower-bound interval) 0) (>= (upper-bound interval) 0)))
 
 (defn div-interval [x y]
-  (if (and (<= (lower-bound y) 0) (>= (upper-bound y) 0))
+  (if (contains-zero? y)
     (throw (Exception. "division by zero"))
     (mul-interval x
                   (make-interval (/ 1.0 (upper-bound y))
                                  (/ 1.0 (lower-bound y))))))
 
+; Exercise 2.11
+(defn pos-interval? [interval]
+  (and (not (contains-zero? interval)) (pos? (upper-bound interval))))
 
+(defn neg-interval? [interval]
+  (and (not (contains-zero? interval)) (neg? (lower-bound interval))))
+
+(defn mul-interval-new [x y]
+  (cond
+
+    (and (pos-interval? x) (pos-interval? y)) (make-interval (* (lower-bound x) (lower-bound y)) (* (upper-bound x) (upper-bound y)))
+    (and (pos-interval? x) (neg-interval? y)) (make-interval (* (upper-bound x) (lower-bound y)) (* (lower-bound x) (upper-bound y)))
+    (and (pos-interval? x) (contains-zero? y)) (make-interval (* (upper-bound x) (lower-bound y)) (* (upper-bound x) (upper-bound y)))
+    (and (neg-interval? x) (pos-interval? y)) (make-interval (* (lower-bound x) (upper-bound y)) (* (upper-bound x) (lower-bound y)))
+    (and (neg-interval? x) (neg-interval? y)) (make-interval (* (upper-bound x) (upper-bound y)) (* (lower-bound x) (lower-bound y)))
+    (and (neg-interval? x) (contains-zero? y)) (make-interval (* (lower-bound x) (upper-bound y)) (* (lower-bound x) (lower-bound y)))
+    (and (contains-zero? x) (pos-interval? y)) (make-interval (* (lower-bound x) (upper-bound y)) (* (upper-bound x) (upper-bound y)))
+    (and (contains-zero? x) (neg-interval? y)) (make-interval (* (upper-bound x) (lower-bound y)) (* (lower-bound x) (lower-bound y)))
+    (and (contains-zero? x) (contains-zero? y)) (mul-interval x y)))
 
