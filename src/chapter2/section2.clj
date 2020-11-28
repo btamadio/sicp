@@ -177,3 +177,41 @@
       (empty? remaining) result
       (seq? (first remaining)) (recur (rest remaining) (concat result (fringe (first remaining))))
       :else (recur (rest remaining) (concat result (list (first remaining)))))))
+
+; Exercise 2.29
+
+(defn make-mobile [left right]
+  (list left right))
+
+(defn make-branch [length structure]
+  (list length structure))
+
+; a
+(defn left-branch [mobile]
+  (first mobile))
+
+(defn right-branch [mobile]
+  (first (rest mobile)))
+
+; b
+(defn total-weight [structure]
+  (if (seq? structure)
+    (+ (total-weight (second (left-branch structure)))
+       (total-weight (second (right-branch structure))))
+    structure))
+
+; c
+(defn torque [branch]
+  (* (first branch) (total-weight (second branch))))
+
+(defn balanced? [mobile]
+  (or
+   (not (seq? mobile))
+   (and
+    (= (torque (left-branch mobile)) (torque (right-branch mobile)))
+    (balanced? (second (left-branch mobile)))
+    (balanced? (second (right-branch mobile))))))
+
+; d
+; No code needs to be changed (in Clojure implementation)
+
