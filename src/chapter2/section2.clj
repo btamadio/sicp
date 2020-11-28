@@ -56,7 +56,7 @@
 (defn same-parity [x & others]
   (loop [remaining others
          output (list x)]
-    (cond (empty? remaining) (rev-list output)
+    (cond (empty? remaining) (reverse-list output)
           (= (even? x) (even? (first remaining))) (recur (rest remaining) (cons (first remaining) output))
           :else (recur (rest remaining) output))))
 
@@ -87,11 +87,49 @@
 ; So the first iteration tries to do: (cons nil (square (car things)))
 ; So the car of answer will point to nil
 
-; 2.23
-
+; Exercise 2.23
 (defn for-each [proc items]
   (loop [remaining items]
     (if (empty? remaining) nil
         (do
           (proc (first remaining))
           (recur (rest remaining))))))
+
+; Exercise 2.24
+; (list 1 (list 2 (list 3 4)))
+
+; Result printed by interpreter
+; (1 (2 (3 4)))
+
+; Box and pointer
+; This answer is based on Scheme, in which lists are actually
+; constructed as nested cons cells:
+; (list a b) is constrcuted as: (cons a (cons b nil))
+
+; So (list 1 (list 2 (list 3 4))
+; is (cons 1 (cons (cons 2 (cons (cons 3 (cons 4 nil)) nil)) nil)
+; The box-and-pointer diagram is:
+;  __ __    __ __
+; |. |. |->|. |//|
+;  -- --    -- --
+;   |         |  
+;  __       __ __    __ __
+; | 1|     |. |. |->|. |//|
+;  --       -- --    -- --
+;            |        |
+;           __       __ __    __ __
+;          |2 |     |. |. |->|. |//|
+;           --       -- --    -- --
+;                     |        |
+;                    __       __
+;                   |3 |     |4 |
+;                    --       --
+
+; As a tree:
+;      (list 1 (list 2 (list 3 4)))
+;               / \
+;             1   (list 2 (list 3 4))
+;                      / \
+;                     2  (list 3 4)
+;                           / \
+;                          3  4
