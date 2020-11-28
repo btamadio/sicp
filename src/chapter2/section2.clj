@@ -168,3 +168,12 @@
       (empty? remaining) result
       (seq? (first remaining)) (recur (rest remaining) (cons (deep-reverse-list (first remaining)) result))
       :else (recur (rest remaining) (cons (first remaining) result)))))
+
+; Exercise 2.28
+(defn fringe [tree]
+  (loop [remaining tree
+         result ()]
+    (cond
+      (empty? remaining) result
+      (seq? (first remaining)) (recur (rest remaining) (concat result (fringe (first remaining))))
+      :else (recur (rest remaining) (concat result (list (first remaining)))))))
