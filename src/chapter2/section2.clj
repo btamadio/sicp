@@ -133,3 +133,38 @@
 ;                     2  (list 3 4)
 ;                           / \
 ;                          3  4
+
+; Exercise 2.25
+
+; (1 3 (5 7) 9)
+; (car (cdaddr x))
+
+; ((7))
+; (caar x)
+
+; (1 (2 (3 (4 (5 (6 7))))))
+; (cadadr (cadadr (cadadr x)))
+
+; Good thing we don't have to deal with this mess in Clojure!
+
+; Exercise 2.26
+; (append x y)
+; => (1 2 3 4 5 6)
+; Clojure equivalent: (concat x y)
+
+; (cons x y)
+; ((1 2 3) 4 5 6)
+; Same in Clojure
+
+; (list x y)
+; ((1 2 3) (4 5 6))
+; Same in Clojure
+
+; Exercise 2.27
+(defn deep-reverse-list [items]
+  (loop [remaining items
+         result ()]
+    (cond
+      (empty? remaining) result
+      (seq? (first remaining)) (recur (rest remaining) (cons (deep-reverse-list (first remaining)) result))
+      :else (recur (rest remaining) (cons (first remaining) result)))))
