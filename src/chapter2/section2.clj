@@ -262,18 +262,31 @@
 ;   => (nil (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
 
 ; Exercise 2.33
+(defn accumulate [op initial sequence]
+  (if (empty? sequence)
+    initial
+    (op (first sequence) (accumulate op initial (next sequence)))))
 
 (defn my-map [f coll]
-  (reduce #(concat %1 (list (f %2))) '() coll))
+  (accumulate #(cons (f %1) %2) '() coll))
 
 (defn my-append [seq1 seq2]
-  (reduce #(concat %1 (list %2)) seq1 seq2))
+  (accumulate #(cons %1 %2) seq2 seq1))
 
 (defn length [coll]
-  (reduce (fn [x y] (inc x)) 0 coll))
+  (accumulate (fn [x y] (inc y)) 0 coll))
 
 ; Exercise 2.34
 (defn horner-eval [x coeffs]
-  (reduce (fn [this-coeff higher-terms]
-            (+ (* this-coeff x) higher-terms))
+  (accumulate (fn [this-coeff higher-terms]
+                (+ (* higher-terms x) this-coeff))
+              0
+              coeffs))
+
+; Equivalently, using reduce:
+(defn horner-eval-red [x coeffs]
+  (reduce (fn [higher-terms this-coeff]
+            (+ (* higher-terms x) this-coeff))
           (reverse coeffs)))
+
+; Exercise 2.35
