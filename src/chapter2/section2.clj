@@ -289,4 +289,3 @@
             (+ (* higher-terms x) this-coeff))
           (reverse coeffs)))
 
-; Exercise 2.35
