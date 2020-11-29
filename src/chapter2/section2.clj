@@ -235,8 +235,8 @@
 
 ; Exercise 2.32
 (defn subsets [s]
-  (if (empty? s) '(())
-      (let [the-rest (subsets (rest s))]
+  (if (nil? s) '(())
+      (let [the-rest (subsets (next s))]
         (concat the-rest (map #(cons (first s) %) the-rest)))))
 
 (subsets (list 1 2 3))
