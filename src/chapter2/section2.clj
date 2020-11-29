@@ -179,7 +179,6 @@
       :else (recur (rest remaining) (concat result (list (first remaining)))))))
 
 ; Exercise 2.29
-
 (defn make-mobile [left right]
   (list left right))
 
@@ -191,7 +190,7 @@
   (first mobile))
 
 (defn right-branch [mobile]
-  (first (rest mobile)))
+  (second mobile))
 
 ; b
 (defn total-weight [structure]
@@ -214,4 +213,37 @@
 
 ; d
 ; No code needs to be changed (in Clojure implementation)
+
+; Exercise 2.30
+
+; using first/rest
+(defn square-tree [tree]
+  (cond (not (seq? tree)) (square tree)
+        (empty? tree) nil
+        :else (cons (square-tree (first tree))
+                    (square-tree (rest tree)))))
+
+; using first/next - this is more like Scheme's car/cdr because next returns nil
+; for the last element of the list, whereas rest returns () for the last element of the list
+(defn square-tree [tree]
+  (cond (nil? tree) nil
+        (seq? tree) (cons (square-tree (first tree))
+                          (square-tree (next tree)))
+        :else (square tree)))
+
+; using map
+(defn square-tree [tree]
+  (map (fn [sub-tree]
+         (if (seq? sub-tree)
+           (square-tree sub-tree)
+           (square sub-tree)))
+       tree))
+
+; Exercise 2.31
+(defn tree-map [f tree]
+  (map (fn [sub-tree]
+         (if (seq? sub-tree)
+           (tree-map f sub-tree)
+           (f sub-tree)))
+       tree))
 
