@@ -271,3 +271,9 @@
 
 (defn length [coll]
   (reduce (fn [x y] (inc x)) 0 coll))
+
+; Exercise 2.34
+(defn horner-eval [x coeffs]
+  (reduce (fn [this-coeff higher-terms]
+            (+ (* this-coeff x) higher-terms))
+          (reverse coeffs)))
