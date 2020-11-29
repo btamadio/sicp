@@ -233,3 +233,30 @@
            (f sub-tree)))
        tree))
 
+; Exercise 2.32
+(defn subsets [s]
+  (if (nil? s) (list nil)
+      (let [the-rest (subsets (next s))]
+        (concat the-rest (map #(cons (first s) %) the-rest)))))
+
+(subsets (list 1 2 3))
+; => (nil (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
+
+; This works in the following way:
+; To find all the subsets of (1 2 3), first find all the subsets of (1 2 3)
+; that don't contain the number 1 (subsets (next s))
+; Then create a second set of subsets which is equivalent to this first set, but with 1 added.
+; The union of these two sets of subsets is the set of all subsets of (1 2 3)
+
+; We can work backwards to see how this happens:
+; (subsets nil) 
+;   => (nil)
+; (subsets '(3)) 
+;   => (concat '(nil) (map #(cons 3 %) '(nil))) 
+;   => (nil (3))
+; (subsets '(2 3))
+;   => (concat '(nil (3)) (map #(cons 2 %) '(nil (3))) 
+;   => (nil (3) (2) (2 3))) 
+; (subsets '(1 2 3)) 
+;   => (concat '(nil (3) (2) (2 3)) (map #(cons 1 %) '(nil (3) (2) (2 3))))
+;   => (nil (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
