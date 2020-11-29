@@ -260,3 +260,14 @@
 ; (subsets '(1 2 3)) 
 ;   => (concat '(nil (3) (2) (2 3)) (map #(cons 1 %) '(nil (3) (2) (2 3))))
 ;   => (nil (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
+
+; Exercise 2.33
+
+(defn my-map [f coll]
+  (reduce #(concat %1 (list (f %2))) '() coll))
+
+(defn my-append [seq1 seq2]
+  (reduce #(concat %1 (list %2)) seq1 seq2))
+
+(defn length [coll]
+  (reduce (fn [x y] (inc x)) 0 coll))
