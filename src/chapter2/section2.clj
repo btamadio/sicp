@@ -245,7 +245,7 @@
 ; This works in the following way:
 ; To find all the subsets of (1 2 3), first find all the subsets of (1 2 3)
 ; that don't contain the number 1 (subsets (next s))
-; Then create a second set of subsets which is equivalent to this first set, but with 1 added.
+; Then create a second set of subsets which is equivalent to this first set, but with 1 added to each subset.
 ; The union of these two sets of subsets is the set of all subsets of (1 2 3)
 
 ; We can work backwards to see how this happens:
