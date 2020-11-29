@@ -1,29 +1,27 @@
 (ns chapter2.section2)
 
 ; Exercise 2.17
-
 (defn last-pair [items]
-  (if (empty? (rest items)) (first items)
-      (recur (rest items))))
+  (if (nil? (next items)) (first items)
+      (recur (next items))))
 
 ; Exercise 2.18
 (defn reverse-list [items]
   (loop [remaining items
          result ()]
-    (if (empty? remaining)
+    (if (nil? remaining)
       result
-      (recur (rest remaining) (cons (first remaining) result)))))
+      (recur (next remaining) (cons (first remaining) result)))))
 
 ; Exercise 2.19
-
 (defn no-more? [coin-values]
-  (empty? coin-values))
+  (nil? coin-values))
 
 (defn first-denomination [coin-values]
   (first coin-values))
 
 (defn except-first-denomination [coin-values]
-  (rest coin-values))
+  (next coin-values))
 
 (defn cc [amount coin-values]
   (cond (= amount 0) 1
@@ -56,9 +54,9 @@
 (defn same-parity [x & others]
   (loop [remaining others
          output (list x)]
-    (cond (empty? remaining) (reverse-list output)
-          (= (even? x) (even? (first remaining))) (recur (rest remaining) (cons (first remaining) output))
-          :else (recur (rest remaining) output))))
+    (cond (nil? remaining) (reverse-list output)
+          (= (even? x) (even? (first remaining))) (recur (next remaining) (cons (first remaining) output))
+          :else (recur (next remaining) output))))
 
 ; A much simpler version, using filter:
 (defn same-parity-simple [x & others]
@@ -69,8 +67,8 @@
   (* x x))
 
 (defn square-list [items]
-  (if (empty? items) ()
-      (cons (square (first items)) (square-list (rest items)))))
+  (if (nil? items) nil
+      (cons (square (first items)) (square-list (next items)))))
 
 (square-list (list 1 2 3 4))
 ; => (1 4 9 16)
@@ -89,11 +87,10 @@
 
 ; Exercise 2.23
 (defn for-each [proc items]
-  (loop [remaining items]
-    (if (empty? remaining) nil
-        (do
-          (proc (first remaining))
-          (recur (rest remaining))))))
+  (if (nil? items) nil
+      (do
+        (proc (first items))
+        (recur proc (next items)))))
 
 ; Exercise 2.24
 ; (list 1 (list 2 (list 3 4)))
@@ -134,40 +131,39 @@
 ;                           / \
 ;                          3  4
 
-; Exercise 2.25
+; Exercise 2.25: first/next instead of car/cdr
+(first (next (first  (next (next '(1 3 (5 7) 9))))))
+; => 7
 
-; (1 3 (5 7) 9)
-; (car (cdaddr x))
+(first (first '((7))))
+; => 7
 
-; ((7))
-; (caar x)
-
-; (1 (2 (3 (4 (5 (6 7))))))
-; (cadadr (cadadr (cadadr x)))
-
-; Good thing we don't have to deal with this mess in Clojure!
+(first (next (first (next (first (next (first (next (first (next (first (next '(1 (2 (3 (4 (5 (6 7))))))))))))))))))
+; => 7
 
 ; Exercise 2.26
-; (append x y)
+(def x (list 1 2 3))
+(def y (list 4 5 6))
+
+; Clojure equivalent to Scheme's append is concat:
+(concat x y)
 ; => (1 2 3 4 5 6)
-; Clojure equivalent: (concat x y)
 
-; (cons x y)
-; ((1 2 3) 4 5 6)
-; Same in Clojure
+(cons x y)
+; => ((1 2 3) 4 5 6)
 
-; (list x y)
-; ((1 2 3) (4 5 6))
-; Same in Clojure
+
+(list x y)
+; => ((1 2 3) (4 5 6))
 
 ; Exercise 2.27
 (defn deep-reverse-list [items]
   (loop [remaining items
          result ()]
     (cond
-      (empty? remaining) result
-      (seq? (first remaining)) (recur (rest remaining) (cons (deep-reverse-list (first remaining)) result))
-      :else (recur (rest remaining) (cons (first remaining) result)))))
+      (nil? remaining) result
+      (not (seq? (first remaining))) (recur (next remaining) (cons (first remaining) result))
+      :else (recur (next remaining) (cons (deep-reverse-list (first remaining)) result)))))
 
 ; Exercise 2.28
 (defn fringe [tree]
@@ -215,21 +211,11 @@
 ; No code needs to be changed (in Clojure implementation)
 
 ; Exercise 2.30
-
-; using first/rest
-(defn square-tree [tree]
-  (cond (not (seq? tree)) (square tree)
-        (empty? tree) nil
-        :else (cons (square-tree (first tree))
-                    (square-tree (rest tree)))))
-
-; using first/next - this is more like Scheme's car/cdr because next returns nil
-; for the last element of the list, whereas rest returns () for the last element of the list
 (defn square-tree [tree]
   (cond (nil? tree) nil
-        (seq? tree) (cons (square-tree (first tree))
-                          (square-tree (next tree)))
-        :else (square tree)))
+        (not (seq? tree)) (square tree)
+        :else (cons (square-tree (first tree))
+                    (square-tree (next tree)))))
 
 ; using map
 (defn square-tree [tree]
