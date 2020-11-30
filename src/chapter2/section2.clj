@@ -265,7 +265,7 @@
 (defn accumulate [op initial sequence]
   (if (empty? sequence)
     initial
-    (op (first sequence) (accumulate op initial (next sequence)))))
+    (op (first sequence) (accumulate op initial (rest sequence)))))
 
 (defn my-map [f coll]
   (accumulate #(cons (f %1) %2) '() coll))
@@ -289,3 +289,66 @@
             (+ (* higher-terms x) this-coeff))
           (reverse coeffs)))
 
+; Exercise 2.35
+(defn count-leaves [tree]
+  (accumulate (fn [x y]
+                (if (seq? x)
+                  (+ (count-leaves x) y)
+                  (inc y)))
+              0 tree))
+
+; Exercise 2.36
+(defn accumulate-n [op init seqs]
+  (if (nil? (first seqs))
+    nil
+    (cons (accumulate op init (map first seqs))
+          (accumulate-n op init (map next seqs)))))
+
+; Exercise 2.37
+(defn dot-product [v w]
+  (accumulate + 0 (map * v w)))
+
+(defn matrix-*-vector [m v]
+  (map #(dot-product %1 v) m))
+
+(defn transpose [m]
+  (accumulate-n cons '() m))
+
+(defn matrix-*-matrix [m n]
+  (let [cols (transpose n)]
+    (map #(matrix-*-vector cols %) m)))
+
+; Exercise 2.38
+(defn fold-right [op initial sequence]
+  (if (empty? sequence)
+    initial
+    (op (first sequence) (fold-right op initial (rest sequence)))))
+
+(defn fold-left [op initial sequence]
+  (loop [result initial
+         remaining sequence]
+    (if (empty? remaining)
+      result
+      (recur (op result (first remaining)) (rest remaining)))))
+
+(fold-right / 1 (list 1 2 3))
+; => 3/2
+
+(fold-left / 1 (list 1 2 3))
+; => 1/6
+
+(fold-right list '() (list 1 2 3))
+; => (1 (2 (3 ())))
+
+(fold-left list '() (list 1 2 3))
+; => (((() 1 ) 2) 3)
+
+; For fold-left and fold-right to produce the same values for any sequence, the operator
+; must be associative, i.e. (op (op a b) c) = (op a (op b c))
+
+; Exercise 2.39
+(defn rev-left [sequence]
+  (fold-left #(cons %2 %1) '() sequence))
+
+(defn rev-right [sequence]
+  (fold-right #(concat %2 (list %1)) '() sequence))
