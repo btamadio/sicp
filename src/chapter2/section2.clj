@@ -319,10 +319,7 @@
     (map #(matrix-*-vector cols %) m)))
 
 ; Exercise 2.38
-(defn fold-right [op initial sequence]
-  (if (empty? sequence)
-    initial
-    (op (first sequence) (fold-right op initial (rest sequence)))))
+(def fold-right accumulate)
 
 (defn fold-left [op initial sequence]
   (loop [result initial
