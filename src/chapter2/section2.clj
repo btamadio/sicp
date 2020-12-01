@@ -349,3 +349,28 @@
 
 (defn rev-right [sequence]
   (fold-right #(concat %2 (list %1)) '() sequence))
+
+; Exercise 2.40
+(defn flatmap [f coll]
+  (accumulate concat '() (map f coll)))
+
+(defn prime? [n]
+  (if (< 1 n)
+    (empty? (filter #(= 0 (mod n %)) (range 2 n)))
+    false))
+
+(defn prime-sum? [pair]
+  (prime? (+ (first pair) (second pair))))
+
+(defn make-pair-sum [pair]
+  (list (first pair) (second pair) (+ (first pair) (second pair))))
+
+(defn unique-pairs [n]
+  (flatmap (fn [i]
+             (map (fn [j] (list i j))
+                  (range 1 i)))
+           (range 2 (inc n))))
+
+(defn prime-sum-pairs [n]
+  (map make-pair-sum
+       (filter prime-sum? (unique-pairs n))))
