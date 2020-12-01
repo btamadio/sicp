@@ -374,3 +374,23 @@
 (defn prime-sum-pairs [n]
   (map make-pair-sum
        (filter prime-sum? (unique-pairs n))))
+
+; Exercise 2.41
+; Unique triples < n = unique triples < n-1 + unique pairs < n
+(defn unique-triples [n]
+  (cond
+    (< n 4) '()
+    (= n 4) '((3 2 1))
+    :else (concat
+           (map #(cons (dec n) %1) (unique-pairs (- n 2)))
+           (unique-triples (dec n)))))
+
+(defn sum-s? [nums s]
+  (= s (reduce + nums)))
+
+(defn sum-s-triples [n s]
+  (filter #(sum-s? %1 s) (unique-triples n)))
+
+(sum-s-triples 10 11)
+; => ((8 2 1) (7 3 1) (6 3 2) (6 4 1) (5 4 2))
+
