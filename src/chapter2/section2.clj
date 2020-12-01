@@ -380,7 +380,6 @@
 (defn unique-triples [n]
   (cond
     (< n 4) '()
-    (= n 4) '((3 2 1))
     :else (concat
            (map #(cons (dec n) %1) (unique-pairs (- n 2)))
            (unique-triples (dec n)))))
@@ -393,4 +392,3 @@
 
 (sum-s-triples 10 11)
 ; => ((8 2 1) (7 3 1) (6 3 2) (6 4 1) (5 4 2))
-
