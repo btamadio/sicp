@@ -355,9 +355,7 @@
   (accumulate concat '() (map f coll)))
 
 (defn prime? [n]
-  (if (< 1 n)
-    (empty? (filter #(= 0 (mod n %)) (range 2 n)))
-    false))
+  (and (> n 1) (not-any? #(= 0 (mod n %)) (range 2 n))))
 
 (defn prime-sum? [pair]
   (prime? (+ (first pair) (second pair))))
