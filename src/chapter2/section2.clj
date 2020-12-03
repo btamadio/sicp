@@ -351,9 +351,6 @@
   (fold-right #(concat %2 (list %1)) '() sequence))
 
 ; Exercise 2.40
-(defn flatmap [f coll]
-  (accumulate concat '() (map f coll)))
-
 (defn prime? [n]
   (and (> n 1) (not-any? #(= 0 (mod n %)) (range 2 n))))
 
@@ -363,11 +360,12 @@
 (defn make-pair-sum [pair]
   (list (first pair) (second pair) (+ (first pair) (second pair))))
 
+; Clojure has mapcat instead of flatmap
 (defn unique-pairs [n]
-  (flatmap (fn [i]
-             (map (fn [j] (list i j))
-                  (range 1 i)))
-           (range 2 (inc n))))
+  (mapcat (fn [i]
+            (map (fn [j] (list i j))
+                 (range 1 i)))
+          (range 2 (inc n))))
 
 (defn prime-sum-pairs [n]
   (map make-pair-sum
@@ -390,3 +388,35 @@
 
 (sum-s-triples 10 11)
 ; => ((8 2 1) (7 3 1) (6 3 2) (6 4 1) (5 4 2))
+
+; Exercise 2.42
+(def empty-board '(nil))
+
+(defn safe? [k positions]
+  (let [kth-queen (first (filter #(= k (second %)) positions))
+        check-sum (reduce + kth-queen)
+        check-diff (reduce - kth-queen)
+        in-check? #(and (not= % kth-queen)
+                        (or
+                         (= check-sum (reduce + %))
+                         (= check-diff (reduce - %))
+                         (= (first %) (first kth-queen))))]
+    (empty? (filter in-check? positions))))
+
+(defn adjoin-position [new-row k rest-of-queens]
+  (cons (list new-row k) rest-of-queens))
+
+(defn queens [board-size]
+  (defn queen-cols [k]
+    (if (= k 0)
+      empty-board
+      (filter
+       (fn [positions] (safe? k positions))
+       (mapcat
+        (fn [rest-of-queens]
+          (map (fn [new-row]
+                 (adjoin-position new-row k rest-of-queens))
+               (range 1 (inc board-size))))
+        (queen-cols (dec k))))))
+  (queen-cols board-size))
+
