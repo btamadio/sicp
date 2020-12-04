@@ -390,7 +390,7 @@
 ; => ((8 2 1) (7 3 1) (6 3 2) (6 4 1) (5 4 2))
 
 ; Exercise 2.42
-(def empty-board '(nil))
+(def empty-board nil)
 
 (defn safe? [k positions]
   (let [kth-queen (first (filter #(= k (second %)) positions))
@@ -409,7 +409,7 @@
 (defn queens [board-size]
   (defn queen-cols [k]
     (if (= k 0)
-      empty-board
+      (list empty-board)
       (filter
        (fn [positions] (safe? k positions))
        (mapcat
@@ -419,4 +419,17 @@
                (range 1 (inc board-size))))
         (queen-cols (dec k))))))
   (queen-cols board-size))
+
+; Exercise 2.43
+; Louis version is slow because the recursive call is happening
+; many more times. In the first version, the recursive call happens 
+; once for each column. In the second version, the recursive call 
+; happens board-size times for each column, because it is 
+; called for every row for each new column.
+
+; For example, for k=5, the time will be 5*(T_4) where T_4 is the number
+; of recursive calls for k=4, which is 5*(T_3) = 5*5*T_2 = 5*5*5*5
+
+; So, for the eight-queens puzzle, if the first version completes in time T, 
+; Louis' slower version would complete in time T^8
 
