@@ -433,3 +433,27 @@
 ; So, for the eight-queens puzzle, if the first version completes in time T, 
 ; Louis' slower version would complete in time T^8
 
+(def beside #(conj [] %1 %2))
+(def below #(conj []  [%1] [%2]))
+
+; Exercise 2.44
+(defn right-split [painter n]
+  (if (= n 0)
+    painter
+    (let [smaller (right-split painter (dec n))]
+      (beside painter (below smaller smaller)))))
+
+(defn up-split [painter n]
+  (if (= n 0)
+    painter
+    (let [smaller (up-split painter (dec n))]
+      (below painter (beside smaller smaller)))))
+
+
+; Exercise 2.45
+(defn split [f1 f2]
+  (fn [painter n]
+    (if (= n 0)
+      painter
+      (let [smaller ((split f1 f2) painter (dec n))]
+        (f1 painter (f2 smaller smaller))))))
