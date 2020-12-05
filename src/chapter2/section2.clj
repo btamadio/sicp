@@ -457,3 +457,62 @@
       painter
       (let [smaller ((split f1 f2) painter (dec n))]
         (f1 painter (f2 smaller smaller))))))
+
+; Exercise 2.46
+(defn make-vect [xcor ycor]
+  (list xcor ycor))
+
+(defn xcor-vect [v]
+  (first v))
+
+(defn ycor-vect [v]
+  (second v))
+
+(defn add-vect [v1 v2]
+  (make-vect (+ (xcor-vect v1) (xcor-vect v2))
+             (+ (ycor-vect v1) (ycor-vect v2))))
+
+(defn sub-vect [v1 v2]
+  (make-vect (- (xcor-vect v1) (xcor-vect v2))
+             (- (ycor-vect v1) (ycor-vect v2))))
+
+(defn scale-vect [s v]
+  (make-vect (* s (xcor-vect v)) (* s (ycor-vect v))))
+
+; Exercise 2.47
+; We'll have to do some work to translate this into Clojure.
+; We'll model a cons cell as a list of lenght 2 and
+; define car/cdr as Clojure's first/second
+(def car first)
+(def cdr second)
+
+; In Scheme, (list origin edge1 edge2)
+; is syntactic sugar for (cons origin (cons edge1 (cons edge2 nil)))
+; We can mimic this data structure using:
+(defn make-frame1 [origin edge1 edge2]
+  (list origin (list edge1 (list edge2 nil))))
+
+(defn origin-frame1 [frame]
+  (car frame))
+
+(defn edge1-frame1 [frame]
+  (car (cdr frame)))
+
+(defn edge2-frame1 [frame]
+  (car (cdr (cdr frame))))
+
+; The second constructor is (cons origin (cons edge1 edge2))
+; which we can achieve in Clojure with:
+(defn make-frame2 [origin edge1 edge2]
+  (list origin (list edge1 edge2)))
+
+(defn origin-frame2 [frame]
+  (car frame))
+
+(defn edge1-frame2 [frame]
+  (car (cdr frame)))
+
+(defn edge2-frame2 [frame]
+  (cdr (cdr frame)))
+
+
