@@ -486,7 +486,7 @@
 (def car first)
 (def cdr second)
 
-; In Scheme, (list origin edge1 edge2)
+; In Scheme the expression (list origin edge1 edge2)
 ; is syntactic sugar for (cons origin (cons edge1 (cons edge2 nil)))
 ; We can mimic this data structure using:
 (defn make-frame1 [origin edge1 edge2]
@@ -502,7 +502,7 @@
   (car (cdr (cdr frame))))
 
 ; The second constructor is (cons origin (cons edge1 edge2))
-; which we can achieve in Clojure with:
+; which we can mimic in Clojure with:
 (defn make-frame2 [origin edge1 edge2]
   (list origin (list edge1 edge2)))
 
@@ -515,4 +515,52 @@
 (defn edge2-frame2 [frame]
   (cdr (cdr frame)))
 
+; Exercise 2.48
+(defn make-segment [start-x start-y end-x end-y]
+  (list (make-vect start-x start-y) (make-vect end-x end-y)))
 
+(defn start-segment [segment]
+  (first segment))
+
+(defn end-segment [segment]
+  (second segment))
+
+; Exercise 2.49
+(def draw-outline
+  (segments->painter (list
+                      (make-segment 0 0 1 0)
+                      (make-segment 1 0 1 1)
+                      (make-segment 1 1 0 1)
+                      (make-segment 0 1 0 0))))
+
+(def draw-x
+  (segments->painter (list
+                      (make-segment 0 1 1 0)
+                      (make-segment 0 0 1 1))))
+
+(def draw-diamond
+  (segments->painter (list
+                      (make-segment 0.0 0.5 0.5 0.0)
+                      (make-segment 0.5 0.0 1.0 0.5)
+                      (make-segment 1.0 0.5 0.5 1.0)
+                      (make-segment 0.5 1.0 0.0 0.5))))
+
+(def draw-wave
+  (segments-painter (list
+                     (make-segment 0.45 1.00 0.40 0.85) ; start left side of head
+                     (make-segment 0.40 0.85 0.45 0.70)
+                     (make-segment 0.45 0.70 0.35 0.70) ; left shoulder
+                     (make-segment 0.35 0.70 0.25 0.60) ; start left arm
+                     (make-segment 0.25 0.60 0.00 0.85)
+                     (make-segment 0.00 0.70 0.25 0.40)
+                     (make-segment 0.25 0.40 0.37 0.55)
+                     (make-segment 0.37 0.55 0.40 0.50)
+                     (make-segment 0.40 0.50 0.00 0.35) ; start left leg
+                     (make-segment 0.00 0.45 0.50 0.30)
+                     (make-segment 0.50 0.30 0.00 0.55) ; start right leg
+                     (make-segment 0.00 0.65 0.30 0.55)
+                     (make-segment 0.30 0.55 1.00 0.20) ; start right arm
+                     (make-segment 1.00 0.25 0.65 0.70) 
+                     (make-segment 0.65 0.70 0.55 0.70) ; right shoulder
+                     (make-segemnt 0.55 0.70 0.60 0.85) ; start right side of head
+                     (make-segment 0.60 0.85 0.55 1.00))))
