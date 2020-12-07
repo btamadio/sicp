@@ -657,3 +657,43 @@
 
 (defn below-2 [painter1 painter2]
   (rotate90 (beside (rotate270 painter1) (rotate270 painter2))))
+
+; Exercise 2.52
+; a
+
+(def draw-wave
+  (segments->painter (list
+                     (make-segment 0.45 1.00 0.40 0.85) ; start left side of head
+                     (make-segment 0.40 0.85 0.45 0.70)
+                     (make-segment 0.45 0.70 0.35 0.70) ; left shoulder
+                     (make-segment 0.35 0.70 0.25 0.60) ; start left arm
+                     (make-segment 0.25 0.60 0.00 0.85)
+                     (make-segment 0.00 0.70 0.25 0.40)
+                     (make-segment 0.25 0.40 0.37 0.55)
+                     (make-segment 0.37 0.55 0.40 0.50)
+                     (make-segment 0.40 0.50 0.00 0.35) ; start left leg
+                     (make-segment 0.00 0.45 0.50 0.30)
+                     (make-segment 0.50 0.30 0.00 0.55) ; start right leg
+                     (make-segment 0.00 0.65 0.30 0.55)
+                     (make-segment 0.30 0.55 1.00 0.20) ; start right arm
+                     (make-segment 1.00 0.25 0.65 0.70) 
+                     (make-segment 0.65 0.70 0.55 0.70) ; right shoulder
+                     (make-segment 0.55 0.70 0.60 0.85) ; start right side of head
+                     (make-segment 0.60 0.85 0.55 1.00)
+                     (make-segment 0.45 0.75 0.55 0.75)))) ; mouth
+
+; b
+(defn corner-split [painter n]
+  (if (zero? n)
+    painter
+    (let [up (up-split painter (dec n))
+          right (right-split painter (dec n))
+          corner (corner-split painter (dec n))]
+      (beside (below painter up)
+              (below right corner)))))
+
+; c
+(defn square-limit [painter n]
+  (let [quarter (corner-split (flip-horiz painter) n)
+        half (beside (flip-horiz quarter) quarter)]
+    (below (flip-vert half) half)))
