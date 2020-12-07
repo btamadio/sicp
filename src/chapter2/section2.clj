@@ -481,7 +481,7 @@
 
 ; Exercise 2.47
 ; We'll have to do some work to translate this into Clojure.
-; We'll model a cons cell as a list of lenght 2 and
+; We'll model a cons cell as a list of length 2 and
 ; define car/cdr as Clojure's first/second
 (def car first)
 (def cdr second)
@@ -503,16 +503,16 @@
 
 ; The second constructor is (cons origin (cons edge1 edge2))
 ; which we can mimic in Clojure with:
-(defn make-frame2 [origin edge1 edge2]
+(defn make-frame [origin edge1 edge2]
   (list origin (list edge1 edge2)))
 
-(defn origin-frame2 [frame]
+(defn origin-frame [frame]
   (car frame))
 
-(defn edge1-frame2 [frame]
+(defn edge1-frame [frame]
   (car (cdr frame)))
 
-(defn edge2-frame2 [frame]
+(defn edge2-frame [frame]
   (cdr (cdr frame)))
 
 ; Exercise 2.48
@@ -524,6 +524,10 @@
 
 (defn end-segment [segment]
   (second segment))
+
+; Dummy function because we don't have an implementation of draw-line
+(defn segments->painter [segment-list]
+  segment-list)
 
 ; Exercise 2.49
 (def draw-outline
@@ -546,7 +550,7 @@
                       (make-segment 0.5 1.0 0.0 0.5))))
 
 (def draw-wave
-  (segments-painter (list
+  (segments->painter (list
                      (make-segment 0.45 1.00 0.40 0.85) ; start left side of head
                      (make-segment 0.40 0.85 0.45 0.70)
                      (make-segment 0.45 0.70 0.35 0.70) ; left shoulder
@@ -562,5 +566,94 @@
                      (make-segment 0.30 0.55 1.00 0.20) ; start right arm
                      (make-segment 1.00 0.25 0.65 0.70) 
                      (make-segment 0.65 0.70 0.55 0.70) ; right shoulder
-                     (make-segemnt 0.55 0.70 0.60 0.85) ; start right side of head
+                     (make-segment 0.55 0.70 0.60 0.85) ; start right side of head
                      (make-segment 0.60 0.85 0.55 1.00))))
+
+; Exercise 2.50
+; To see the results of our transformations, I'll define a function
+; that prints the four corners of a frame as a "painter" 
+(defn print-corners [frame]
+  (let [origin (origin-frame frame)
+        edge1 (edge1-frame frame)
+        edge2 (edge2-frame frame)]
+    (println (add-vect origin edge2) (add-vect origin (add-vect edge1 edge2)))
+    (println origin (add-vect origin edge1))))
+
+(defn frame-coord-map [frame]
+  (fn [v]
+    (add-vect
+     (origin-frame frame)
+     (add-vect (scale-vect (xcor-vect v)
+                           (edge1-frame frame))
+               (scale-vect (ycor-vect v)
+                           (edge2-frame frame))))))
+
+(defn transform-painter [painter origin corner1 corner2]
+  (fn [frame]
+    (let [m (frame-coord-map frame)
+          new-origin (m origin)]
+      (painter
+       (make-frame new-origin
+                   (sub-vect (m corner1) new-origin)
+                   (sub-vect (m corner2) new-origin))))))
+
+(defn flip-vert [painter]
+  (transform-painter painter
+                     (make-vect 0.0 1.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+
+(defn flip-horiz [painter]
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+
+
+
+(defn rotate180 [painter]
+  ((comp flip-vert flip-horiz) painter))
+
+(defn rotate90 [painter]
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+
+(defn rotate270 [painter]
+  (transform-painter painter
+                     (make-vect 0.0 1.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+
+; Exercise 2.51
+(defn beside [painter1 painter2]
+  (let [split-point (make-vect 0.5 0.0)
+        paint-left (transform-painter painter1
+                                      (make-vect 0.0 0.0)
+                                      split-point
+                                      (make-vect 0.0 1.0))
+        paint-right (transform-painter painter2
+                                       split-point
+                                       (make-vect 1.0 0.0)
+                                       (make-vect 0.5 1.0))]
+    (fn [frame]
+      (paint-left frame)
+      (paint-right frame))))
+
+(defn below [painter1 painter2]
+  (let [split-point (make-vect 0.0 0.5)
+        paint-bottom (transform-painter painter1
+                                      (make-vect 0.0 0.0)
+                                      (make-vect 1.0 0.0)
+                                      split-point)
+        paint-top (transform-painter painter2
+                                       split-point
+                                       (make-vect 1.0 0.5)
+                                       (make-vect 0.0 1.0))]
+    (fn [frame]
+      (paint-bottom frame)
+      (paint-top frame))))
+
+(defn below-2 [painter1 painter2]
+  (rotate90 (beside (rotate270 painter1) (rotate270 painter2))))
