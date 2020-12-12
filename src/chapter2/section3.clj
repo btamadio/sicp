@@ -113,9 +113,6 @@
     (=number? a2 0) a1
     (and (number? a1) (number? a2)) (+ a1 a2)
     (sum? a2) (concat (list '+ a1) (rest a2))
-    (product? a2) (list '+ a1 a2)
-    (exponentiation? a2) (list '+ a1 a2)
-    (seq? a2) (concat (list '+ a1) a2)
     :else (list '+ a1 a2)))
 
 (defn make-product [m1 m2]
@@ -125,19 +122,16 @@
     (= m2 1) m1
     (and (number? m1) (number? m2)) (* m1 m2)
     (product? m2) (concat (list '* m1) (rest m2))
-    (sum? m2) (list '* m1 m2)
-    (exponentiation? m2) (list '* m1 m2)
-    (seq? m2) (concat (list '* m1) m2)
     :else (list '* m1 m2)))
 
 (defn augend [s]
   (let [terms (rest (rest s))]
-    (cond
+    (if
       (= (count terms) 1) (first terms)
-      :else (make-sum (first terms) (rest terms)))))
+      (cons '+ terms))))
 
 (defn multiplicand [p]
   (let [terms (rest (rest p))]
-    (cond
-      (= (count terms) 1) (first terms)
-      :else (make-product (first terms) (rest terms)))))
+    (if
+        (= (count terms) 1) (first terms)
+        (cons '* terms))))
