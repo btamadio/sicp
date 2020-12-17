@@ -87,8 +87,30 @@
 
 ; Exercise 1.13
 
-; Exercise 1.14
+; Let P(k) be the statement: F(k) = (phi^k - psi^k)/sqrt(5)
 
+; Base cases:
+; P(0): 
+;     F(0) = (phi^0 - psi^0)/sqrt(5) = 0
+; P(1):
+;     F(1) = (phi^1 - psi^1)/sqrt(5) = 1
+
+; Induction step:
+
+; Prove that:
+; For any k > 1, if P(k) and P(k-1) are true, then P(k+1) must be true
+
+; Assume P(k) and P(k-1) and use the definition of Fibonacci numbers:
+; Fib(k+1) = Fib(k) + Fib(k-1)
+; Fib(k+1) = (phi^k - psi^k)/sqrt(5) + (phi^(k-1) + psi^(k-1))/sqrt(5)
+
+; Then we know that phi^(k-1) = (phi^k)/phi = (phi^k)*(phi-1) = phi^(k+1) - phi^k
+; And we can do the same trick with psi, to make the right side reduce to:
+; Fib(k+1) = (phi^(k+1) - psi^(k+1))/sqrt(5)
+; So we have proved that, for any k > 1, P(k) && P(k-1) -> P(k+1)
+; Together with the base cases P(0) and P(1), this proves P(k) for any non-negative integer k
+
+; Exercise 1.14
 (def first-denom {1 1 2 5 3 10 4 25 5 50})
 
 (defn cc [amount kinds-of-coins]
